@@ -41,7 +41,7 @@ void can0_isr_callback(can_msg_t* data) __attribute__ ((weak));
 /* @beief     CAN0初始化函数
  * @return    0 - 成功 <0 表示返回失败
  * */
-int8_t bsp_can0_init(void)
+int bsp_can0_init(void)
 {
 	int Status;
 	XCanPs_Config *ConfigPtr;
@@ -94,7 +94,7 @@ int8_t bsp_can0_init(void)
  * @param[in] can_msg - 需要发送的CAN数据
  * @return    0 - 成功 <0 表示返回失败
  * */
-int8_t bsp_can0_send(can_msg_t can_msg)
+int bsp_can0_send(can_msg_t can_msg)
 {
 	int Status;
 

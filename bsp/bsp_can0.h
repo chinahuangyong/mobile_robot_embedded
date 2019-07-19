@@ -54,13 +54,13 @@ typedef struct
 /* @beief     CAN0初始化函数
  * @return    0 - 成功 <0 表示返回失败
  * */
-int8_t bsp_can0_init(void);
+int bsp_can0_init(void);
 
 /* @beief     CAN0初始化函数
  * @param[in] can_msg - 需要发送的CAN数据
  * @return    0 - 成功 <0 表示返回失败
  * */
-int8_t bsp_can0_send(can_msg_t can_msg);
+int bsp_can0_send(can_msg_t can_msg);
 
 #ifdef __cplusplus
 }
