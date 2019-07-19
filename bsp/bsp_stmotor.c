@@ -383,7 +383,7 @@ void can0_isr_callback(can_msg_t* data)
 	{
 		if(can_msg.data[0] == left_motor_id)
 		{
-			if(can_msg.data[1] == 0x1F)	//使能返回的正常功能码
+			if(can_msg.data[1] == 0x25)	//使能返回的正常功能码
 			{
 				if(can_msg.data[2] == 0x00 && can_msg.data[3] == 0x10)	//Fn010
 				{
@@ -434,7 +434,7 @@ void can0_isr_callback(can_msg_t* data)
 		}
 		else if(can_msg.data[0] == right_motor_id)
 		{
-			if(can_msg.data[1] == 0x1F)	//使能返回的正常功能码
+			if(can_msg.data[1] == 0x25)	//使能返回的正常功能码
 			{
 				if(can_msg.data[2] == 0x00 && can_msg.data[3] == 0x10)	//Fn010
 				{
