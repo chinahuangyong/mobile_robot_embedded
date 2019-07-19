@@ -41,11 +41,12 @@
 
 
 /* 驱动器ID初始化，具体ID值通过厂家提供的上位机软件来设置 */
-const uint8_t right_motor_id = 1;
-const uint8_t left_motor_id = 2;
+const uint8_t left_motor_id = 1;
+const uint8_t right_motor_id = 2;
+const uint8_t master_id = 0;
 
 //轮子的周长
-const float radius = 5600;	//车辆的半径
+const float radius = 5600;	//车辆的半径(mm)
 const float timeout = 10;	//通信超时时间设置(ms)
 const float PULSE_NUM_PRE_ROUND = 10000;
 
@@ -90,6 +91,7 @@ int bsp_stmotor_enable(void)
 	can_msg_t can_msg;
 
 	xEventGroupClearBits(stmotor_recv_ev, BSP_STMOTOR_EV_ALL);
+	EventBits_t rev_eb;
 
 	//采用应答模式，将电机使能
 	can_msg.std_id = 0x0100 | (left_motor_id);
@@ -97,7 +99,7 @@ int bsp_stmotor_enable(void)
 	can_msg.ide = 0;
 	can_msg.ext_id = 0;
 	can_msg.dlc = 6;
-	can_msg.data[0] = 0x00;
+	can_msg.data[0] = master_id;
 	can_msg.data[1] = 0x24;
 	can_msg.data[2] = 0x00;
 	can_msg.data[3] = 0x10;
@@ -108,11 +110,12 @@ int bsp_stmotor_enable(void)
 	can_msg.std_id = 0x0100 | (right_motor_id);
 	bsp_can0_send(can_msg);
 
-	if(xEventGroupWaitBits(stmotor_recv_ev,
+	rev_eb = xEventGroupWaitBits(stmotor_recv_ev,
 			BSP_STMOTOR_EV_LF_ENABLE | BSP_STMOTOR_EV_RT_ENABLE,
 			pdTRUE,
 			pdTRUE,
-			pdMS_TO_TICKS(timeout)) == pdTRUE)
+			pdMS_TO_TICKS(timeout));
+	if(rev_eb == (EventBits_t)(BSP_STMOTOR_EV_LF_ENABLE | BSP_STMOTOR_EV_RT_ENABLE))
 	{
 		return 0;
 	}
@@ -128,13 +131,16 @@ int bsp_stmotor_enable(void)
 int bsp_stmotor_disable(void)
 {
 	can_msg_t can_msg;
+	EventBits_t rev_eb;
+
+	xEventGroupClearBits(stmotor_recv_ev, BSP_STMOTOR_EV_ALL);
 	//采用应答模式，将电机去使能
 	can_msg.std_id = 0x0100 | (left_motor_id);
 	can_msg.rtr = 0;
 	can_msg.ide = 0;
 	can_msg.ext_id = 0;
 	can_msg.dlc = 6;
-	can_msg.data[0] = 0x00;
+	can_msg.data[0] = master_id;
 	can_msg.data[1] = 0x24;
 	can_msg.data[2] = 0x00;
 	can_msg.data[3] = 0x10;
@@ -145,11 +151,12 @@ int bsp_stmotor_disable(void)
 	can_msg.std_id = 0x0100 | (right_motor_id);
 	bsp_can0_send(can_msg);
 
-	if(xEventGroupWaitBits(stmotor_recv_ev,
+	rev_eb = xEventGroupWaitBits(stmotor_recv_ev,
 				BSP_STMOTOR_EV_LF_DISABLE | BSP_STMOTOR_EV_RT_DISABLE,
 				pdTRUE,
 				pdTRUE,
-				pdMS_TO_TICKS(timeout)) == pdTRUE)
+				pdMS_TO_TICKS(timeout));
+	if(rev_eb == (EventBits_t)(BSP_STMOTOR_EV_LF_DISABLE | BSP_STMOTOR_EV_RT_DISABLE))
 	{
 		return 0;
 	}
@@ -167,13 +174,16 @@ int bsp_stmotor_disable(void)
 int bsp_stmotor_set_rpm_speed(int16_t left_rpm, int16_t right_rpm)
 {
 	can_msg_t can_msg;
+	EventBits_t rev_eb;
+
+	xEventGroupClearBits(stmotor_recv_ev, BSP_STMOTOR_EV_ALL);
 	//采用应答模式发送电机转速
 	can_msg.std_id = 0x0100 | (left_motor_id);
 	can_msg.rtr = 0;
 	can_msg.ide = 0;
 	can_msg.ext_id = 0;
 	can_msg.dlc = 6;
-	can_msg.data[0] = 0x00;
+	can_msg.data[0] = master_id;
 	can_msg.data[1] = 0x28;
 	can_msg.data[2] = 0x00;
 	can_msg.data[3] = 0x00;
@@ -186,11 +196,12 @@ int bsp_stmotor_set_rpm_speed(int16_t left_rpm, int16_t right_rpm)
 	can_msg.data[5] = right_rpm;
 	bsp_can0_send(can_msg);
 
-	if(xEventGroupWaitBits(stmotor_recv_ev,
+	rev_eb = xEventGroupWaitBits(stmotor_recv_ev,
 			BSP_STMOTOR_EV_LF_SETSPEED | BSP_STMOTOR_EV_RT_SETSPEED,
 			pdTRUE,
 			pdTRUE,
-			pdMS_TO_TICKS(timeout)) == pdTRUE)
+			pdMS_TO_TICKS(timeout));
+	if(rev_eb == (EventBits_t)(BSP_STMOTOR_EV_LF_SETSPEED | BSP_STMOTOR_EV_RT_SETSPEED))
 	{
 		return 0;
 	}
@@ -208,13 +219,16 @@ int bsp_stmotor_set_rpm_speed(int16_t left_rpm, int16_t right_rpm)
 int bsp_stmotor_get_rpm_speed(int16_t* left_motor_rpm, int16_t* right_motor_rpm)
 {
 	can_msg_t can_msg;
+	EventBits_t rev_eb;
+
+	xEventGroupClearBits(stmotor_recv_ev, BSP_STMOTOR_EV_ALL);
 	//采用应答模式获取电机转速
 	can_msg.std_id = 0x0100 | (left_motor_id);
 	can_msg.rtr = 0;
 	can_msg.ide = 0;
 	can_msg.ext_id = 0;
 	can_msg.dlc = 4;
-	can_msg.data[0] = 0x00;
+	can_msg.data[0] = master_id;
 	can_msg.data[1] = 0x0A;
 	can_msg.data[2] = 0x00;
 	can_msg.data[3] = 0x00;
@@ -222,11 +236,12 @@ int bsp_stmotor_get_rpm_speed(int16_t* left_motor_rpm, int16_t* right_motor_rpm)
 
 	can_msg.std_id = 0x0100 | (right_motor_id);
 	bsp_can0_send(can_msg);
-	if(xEventGroupWaitBits(stmotor_recv_ev,
+	rev_eb = xEventGroupWaitBits(stmotor_recv_ev,
 				BSP_STMOTOR_EV_LF_GETSPEED | BSP_STMOTOR_EV_RT_GETSPEED,
 				pdTRUE,
 				pdTRUE,
-				pdMS_TO_TICKS(timeout)) == pdTRUE)
+				pdMS_TO_TICKS(timeout));
+	if(rev_eb == (EventBits_t)(BSP_STMOTOR_EV_LF_GETSPEED | BSP_STMOTOR_EV_RT_GETSPEED))
 	{
 		*left_motor_rpm = left_motor_rpm_speed;
 		*right_motor_rpm = right_motor_rpm_speed;
@@ -296,13 +311,16 @@ int bsp_stmotor_get_mmps_speed(float* left_motor_mmps, float* right_motor_mmps)
 int bsp_stmotor_get_pluse_position(int32_t* left_motor_position, int32_t* right_motor_position)
 {
 	can_msg_t can_msg;
+	EventBits_t rev_eb;
+
+	xEventGroupClearBits(stmotor_recv_ev, BSP_STMOTOR_EV_ALL);
 	//采用应答模式获取电机转速
 	can_msg.std_id = 0x0100 | (left_motor_id);
 	can_msg.rtr = 0;
 	can_msg.ide = 0;
 	can_msg.ext_id = 0;
 	can_msg.dlc = 4;
-	can_msg.data[0] = 0x00;
+	can_msg.data[0] = master_id;
 	can_msg.data[1] = 0x0D;
 	can_msg.data[2] = 0x00;
 	can_msg.data[3] = 0x1D;
@@ -310,11 +328,12 @@ int bsp_stmotor_get_pluse_position(int32_t* left_motor_position, int32_t* right_
 
 	can_msg.std_id = 0x0100 | (right_motor_id);
 	bsp_can0_send(can_msg);
-	if(xEventGroupWaitBits(stmotor_recv_ev,
-					BSP_STMOTOR_EV_LF_GETPOSITION | BSP_STMOTOR_EV_RT_GETPOSITION,
-					pdTRUE,
-					pdTRUE,
-					pdMS_TO_TICKS(timeout)) == pdTRUE)
+	rev_eb = xEventGroupWaitBits(stmotor_recv_ev,
+			BSP_STMOTOR_EV_LF_GETPOSITION | BSP_STMOTOR_EV_RT_GETPOSITION,
+			pdTRUE,
+			pdTRUE,
+			pdMS_TO_TICKS(timeout));
+	if(rev_eb == (EventBits_t)(BSP_STMOTOR_EV_LF_GETPOSITION | BSP_STMOTOR_EV_RT_GETPOSITION))
 	{
 		*left_motor_position = left_motor_pulse_position;
 		*right_motor_position = right_motor_pulse_position;
@@ -353,7 +372,7 @@ int bsp_stmotor_get_mm_position(float* left_motor_position, float* right_motor_p
 /* @beief     中断回调函数
  * @return    无
  * */
-void bsp_stmotor_can0_callback(void* data)
+void can0_isr_callback(can_msg_t* data)
 {
 	can_msg_t can_msg;
 	memcpy(&can_msg, (can_msg_t *)data, sizeof(can_msg_t));
@@ -409,9 +428,9 @@ void bsp_stmotor_can0_callback(void* data)
 							((uint32_t)can_msg.data[6]) << 8 | ((uint32_t)can_msg.data[7]);
 					xEventGroupSetBitsFromISR(stmotor_recv_ev, BSP_STMOTOR_EV_LF_GETPOSITION,
 								&pxHigherPriorityTaskWoken);
-
 				}
 			}
+			// else if(can_msg)
 		}
 		else if(can_msg.data[0] == right_motor_id)
 		{
@@ -460,7 +479,6 @@ void bsp_stmotor_can0_callback(void* data)
 							((uint32_t)can_msg.data[6]) << 8 | ((uint32_t)can_msg.data[7]);
 					xEventGroupSetBitsFromISR(stmotor_recv_ev, BSP_STMOTOR_EV_RT_GETPOSITION,
 								&pxHigherPriorityTaskWoken);
-
 				}
 			}
 		}
