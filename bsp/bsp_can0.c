@@ -17,7 +17,6 @@
 //宏定义
 #define CAN0_DEVICE_ID			XPAR_XCANPS_0_DEVICE_ID
 #define CAN0_INTR_VEC_ID		XPAR_XCANPS_0_INTR
-#define XCANPS_MAX_FRAME_SIZE_IN_WORDS ((XCANPS_MAX_FRAME_SIZE) / (sizeof(u32)))
 
 //CAN0的时钟源为24M，设置波特率为500K
 #define BTR_SYNCJUMPWIDTH		3
@@ -30,14 +29,14 @@ XCanPs Can0InstPtr;
 //CAN0句柄指针
 XCanPs *pxCan0InstPtr = &Can0InstPtr;
 
-static u32 TxFrame[XCANPS_MAX_FRAME_SIZE_IN_WORDS];
-static u32 RxFrame[XCANPS_MAX_FRAME_SIZE_IN_WORDS];
+static u32 TxFrame[4];
+static u32 RxFrame[4];
 
 //中断处理函数
 static void can0_isr_handler(void);
 
 //回调函数，目前没有测试，不确定是否可用
-void can0_isr_callback(void) __attribute__ ((weak));
+void can0_isr_callback(can_msg_t* data) __attribute__ ((weak));
 
 /* @beief     CAN0初始化函数
  * @return    0 - 成功 <0 表示返回失败
@@ -141,6 +140,7 @@ static void can0_isr_handler(void)
 //	CanRxMsgTypeDef *RxMessage ;
 	int Status;
 	u32 IntrValue;
+	can_msg_t can_msg;
 
 	Status = XCanPs_ReadReg(pxCan0InstPtr->CanConfig.BaseAddr, XCANPS_ISR_OFFSET) ;
 	if ((Status& XCANPS_IXR_RXNEMP_MASK) != (u32)0)
@@ -168,34 +168,25 @@ static void can0_isr_handler(void)
 						IntrValue);
 
 		/* 使用weak属性设置用户回调函数 */
-		can0_isr_callback();
+		can_msg.ide = (RxFrame[0]&XCANPS_IDR_IDE_MASK)>>XCANPS_IDR_IDE_SHIFT;
+		can_msg.dlc = (RxFrame[1]&XCANPS_DLCR_DLC_MASK)>>XCANPS_DLCR_DLC_SHIFT;
+		/*  */
+		if(can_msg.ide == 1)
+		{
+			can_msg.rtr = (RxFrame[0]&XCANPS_IDR_RTR_MASK)>>XCANPS_IDR_ID2_SHIFT;
+			can_msg.ext_id = (RxFrame[0]&XCANPS_IDR_ID2_MASK)>>XCANPS_IDR_ID2_SHIFT;
+			can_msg.std_id = 0x00000000;
+		}
+		else
+		{
+			can_msg.rtr = (RxFrame[0]&XCANPS_IDR_SRR_MASK)>>XCANPS_IDR_SRR_SHIFT;
+			can_msg.std_id = (RxFrame[0]&XCANPS_IDR_ID1_MASK)>>XCANPS_IDR_ID1_SHIFT;
+			can_msg.ext_id = 0x00000000;
+		}
+		memcpy(&can_msg.data[0], &RxFrame[2], 4);
+		memcpy(&can_msg.data[4], &RxFrame[3], 4);
 
-//	  RxMessage -> IDE =(uint8_t)((XCANPS_IDR_IDE_MASK & RxFrame [0])>> 16);
-//	 if(RxMessage-> IDE == TEST_MESSAGE_ID)
-//	  {
-//		RxMessage-> StdId =(uint32_t)((XCANPS_IDR_ID1_MASK & RxFrame [0])>> 21);
-//	  }
-//	 else
-//	  {
-//		RxMessage-> ExtId =(uint32_t)(((XCANPS_IDR_ID2_MASK & RxFrame [0])>> 1)|
-//						((XCANPS_IDR_ID1_MASK & RxFrame [0])>> 3));
-//	  }
-//
-//	  RxMessage-> RTR =(uint8_t)(XCANPS_IDR_RTR_MASK&RxFrame [0]);
-//
-//	  RxMessage-> DLC =(uint8_t)((XCANPS_DLCR_DLC_MASK&RxFrame [1])>> 28);
-//
-//
-//
-//	  RxMessage-> Data [0] =(uint8_t)(XCANPS_DW1R_DB3_MASK & RxFrame [2]);
-//	  RxMessage-> Data [1] =(uint8_t)((XCANPS_DW1R_DB2_MASK & RxFrame [2])>> 8);
-//	  RxMessage-> Data [2] =(uint8_t)((XCANPS_DW1R_DB1_MASK & RxFrame [2])>> 16);
-//	  RxMessage-> Data [3] =(uint8_t)((XCANPS_DW1R_DB0_MASK & RxFrame [2])>> 24);
-//
-//	  RxMessage-> Data [4] =(uint8_t)(XCANPS_DW2R_DB7_MASK & RxFrame [3]);
-//	  RxMessage-> Data [5] =(uint8_t)((XCANPS_DW2R_DB6_MASK & RxFrame [3])>> 8);
-//	  RxMessage-> Data [6] =(uint8_t)((XCANPS_DW2R_DB5_MASK & RxFrame [3])>> 16);
-//	  RxMessage-> Data [7] =(uint8_t)((XCANPS_DW2R_DB4_MASK & RxFrame [3])>> 24);
+		can0_isr_callback(&can_msg);
 	}
 }
 
