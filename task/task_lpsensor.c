@@ -1,7 +1,7 @@
 /*
  * task_lpsensor.c
  *
- *  Created on: 2019Äê6ÔÂ28ÈÕ
+ *  Created on: 2019ï¿½ï¿½6ï¿½ï¿½28ï¿½ï¿½
  *      Author: HuangYong
  */
 
@@ -48,27 +48,27 @@ void task_lpsensor(void* argument)
 
 	for(;;)
 	{
-		if (xQueueReceive(uartRecQueue, &data, portMAX_DELAY) == pdTRUE)
-		{
-			bsp_lpms_getFrame(data);
-			if(bsp_lpms_isGetFrame())
-			{
-				if(bsp_lpms_parsePacket())
-				{
-					mod_imu_update(lpmsRawData.gyroX, lpmsRawData.gyroY, lpmsRawData.gyroZ,
-							lpmsRawData.accX*-9.8, lpmsRawData.accY*-9.8, lpmsRawData.accZ*-9.8);
-
-					static float data1 = 0;
-					static float data2 = 0;
-				//
-					data1 += lpmsRawData.gyroX*0.01*57.3;
-					data2 += lpmsRawData.gyroY*0.01*57.3;
-
-//					#include "utils_osc.h"
-//					utils_osc_send(pitch, roll, data1, data2);
-				}
-			}
-		}
+//		if (xQueueReceive(uartRecQueue, &data, portMAX_DELAY) == pdTRUE)
+//		{
+//			bsp_lpms_getFrame(data);
+//			if(bsp_lpms_isGetFrame())
+//			{
+//				if(bsp_lpms_parsePacket())
+//				{
+//					mod_imu_update(lpmsRawData.gyroX, lpmsRawData.gyroY, lpmsRawData.gyroZ,
+//							lpmsRawData.accX*-9.8, lpmsRawData.accY*-9.8, lpmsRawData.accZ*-9.8);
+//
+//					static float data1 = 0;
+//					static float data2 = 0;
+//				//
+//					data1 += lpmsRawData.gyroX*0.01*57.3;
+//					data2 += lpmsRawData.gyroY*0.01*57.3;
+//
+////					#include "utils_osc.h"
+////					utils_osc_send(pitch, roll, data1, data2);
+//				}
+//			}
+//		}
 	}
 }
 

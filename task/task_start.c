@@ -5,9 +5,9 @@
   * @version V0.0.1
   * @Company CVTE
   * @date    2017-05-06
-  * @brief   ÈÎÎñÆô¶¯º¯Êý
+  * @brief   ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
   * @history
-       2019.06.20  ÐÂ½¨ÎÄ¼þ
+       2019.06.20  ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
        2019.06.27
 ********************************************************************************/
 #include <bsp_can0.h>
@@ -20,7 +20,7 @@
 #include "xil_printf.h"
 
 #include "bsp_timer.h"
-#include "bsp_motor.h"
+#include "bsp_stmotor.h"
 
 #include "task_start.h"
 #include "task_camera_sync.h"
@@ -45,13 +45,15 @@ void task_start_init(void)
 
 void task_start(void *argument)
 {
+	int ret;
+
 	taskENTER_CRITICAL();
 
 //	bsp_timer_init();
 //	bsp_timer_start();
 
-//	bsp_can0_init();
-
+	bsp_can0_init();
+	bsp_stmotor_init();
 //	task_lpsensor_init();
 
 
@@ -72,10 +74,6 @@ void task_start(void *argument)
 //		bsp_can0_send(can_msg);
 //		vTaskDelay(100);
 
-//		bsp_motor_set_speed_test(100, 100);
-//		vTaskDelay(10000);
-//		bsp_motor_set_speed_test(-100, -100);
-//		vTaskDelay(10000);
 	}
 }
 
