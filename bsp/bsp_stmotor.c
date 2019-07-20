@@ -376,7 +376,7 @@ void can0_isr_callback(can_msg_t* data)
 {
 	can_msg_t can_msg;
 	memcpy(&can_msg, (can_msg_t *)data, sizeof(can_msg_t));
-	BaseType_t pxHigherPriorityTaskWoken;
+	BaseType_t xHigherPriorityTaskWoken;
 
 	//判断接收的数据帧为标准帧，并且为数据帧时
 	if(can_msg.ide == 0 && can_msg.rtr == 0)
@@ -391,12 +391,12 @@ void can0_isr_callback(can_msg_t* data)
 					{
 						//电机驱动器使能应答检测成功
 						xEventGroupSetBitsFromISR(stmotor_recv_ev, BSP_STMOTOR_EV_LF_ENABLE,
-								&pxHigherPriorityTaskWoken);
+								&xHigherPriorityTaskWoken);
 					}
 					else if(can_msg.data[4] == 0x00 && can_msg.data[5] == 0x00)
 					{
 						xEventGroupSetBitsFromISR(stmotor_recv_ev, BSP_STMOTOR_EV_LF_DISABLE,
-								&pxHigherPriorityTaskWoken);
+								&xHigherPriorityTaskWoken);
 					}
 				}
 			}
@@ -406,7 +406,7 @@ void can0_isr_callback(can_msg_t* data)
 				{
 					//设置电机转速应答成功
 					xEventGroupSetBitsFromISR(stmotor_recv_ev, BSP_STMOTOR_EV_LF_SETSPEED,
-								&pxHigherPriorityTaskWoken);
+								&xHigherPriorityTaskWoken);
 				}
 			}
 			else if(can_msg.data[1] == 0x0B)//读转速返回成功应答码
@@ -416,7 +416,7 @@ void can0_isr_callback(can_msg_t* data)
 					left_motor_rpm_speed = ((uint16_t)(can_msg.data[4])<<8) | (can_msg.data[5]);
 					//设置电机转速应答成功
 					xEventGroupSetBitsFromISR(stmotor_recv_ev, BSP_STMOTOR_EV_LF_GETSPEED,
-								&pxHigherPriorityTaskWoken);
+								&xHigherPriorityTaskWoken);
 				}
 			}
 			else if(can_msg.data[1] == 0xE)	//读编码值返回的应答码
@@ -427,7 +427,7 @@ void can0_isr_callback(can_msg_t* data)
 							((uint32_t)can_msg.data[4]) << 24 |((uint32_t)(can_msg.data[5]))<<16 |
 							((uint32_t)can_msg.data[6]) << 8 | ((uint32_t)can_msg.data[7]);
 					xEventGroupSetBitsFromISR(stmotor_recv_ev, BSP_STMOTOR_EV_LF_GETPOSITION,
-								&pxHigherPriorityTaskWoken);
+								&xHigherPriorityTaskWoken);
 				}
 			}
 			// else if(can_msg)
@@ -442,12 +442,12 @@ void can0_isr_callback(can_msg_t* data)
 					{
 						//电机驱动器使能应答检测成功
 						xEventGroupSetBitsFromISR(stmotor_recv_ev, BSP_STMOTOR_EV_RT_ENABLE,
-								&pxHigherPriorityTaskWoken);
+								&xHigherPriorityTaskWoken);
 					}
 					else if(can_msg.data[4] == 0x00 && can_msg.data[5] == 0x00)
 					{
 						xEventGroupSetBitsFromISR(stmotor_recv_ev, BSP_STMOTOR_EV_RT_DISABLE,
-								&pxHigherPriorityTaskWoken);
+								&xHigherPriorityTaskWoken);
 					}
 				}
 			}
@@ -457,7 +457,7 @@ void can0_isr_callback(can_msg_t* data)
 				{
 					//设置电机转速应答成功
 					xEventGroupSetBitsFromISR(stmotor_recv_ev, BSP_STMOTOR_EV_RT_SETSPEED,
-								&pxHigherPriorityTaskWoken);
+								&xHigherPriorityTaskWoken);
 				}
 			}
 			else if(can_msg.data[1] == 0x0B)//读转速返回成功应答码
@@ -467,7 +467,7 @@ void can0_isr_callback(can_msg_t* data)
 					right_motor_rpm_speed = ((uint16_t)(can_msg.data[4])<<8) | (can_msg.data[5]);
 					//设置电机转速应答成功
 					xEventGroupSetBitsFromISR(stmotor_recv_ev, BSP_STMOTOR_EV_RT_GETSPEED,
-								&pxHigherPriorityTaskWoken);
+								&xHigherPriorityTaskWoken);
 				}
 			}
 			else if(can_msg.data[1] == 0xE)	//读编码值返回的应答码
@@ -478,11 +478,12 @@ void can0_isr_callback(can_msg_t* data)
 							((uint32_t)can_msg.data[4]) << 24 |((uint32_t)(can_msg.data[5]))<<16 |
 							((uint32_t)can_msg.data[6]) << 8 | ((uint32_t)can_msg.data[7]);
 					xEventGroupSetBitsFromISR(stmotor_recv_ev, BSP_STMOTOR_EV_RT_GETPOSITION,
-								&pxHigherPriorityTaskWoken);
+								&xHigherPriorityTaskWoken);
 				}
 			}
 		}
 	}
+	portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
 
 
