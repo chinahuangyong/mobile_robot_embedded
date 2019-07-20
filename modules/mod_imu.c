@@ -30,15 +30,22 @@ static float exInt = 0, eyInt = 0, ezInt = 0;
 //imu数据
 static imu_data_t imu_data;
 
-
-uint8_t mod_imu_init(float _kp, float _ki, float _halfT)
+/* @beief     imu计算函数初始化
+ * @return    0 - 成功 <0 表示返回失败
+ * */
+int mod_imu_init(float _kp, float _ki, float _halfT)
 {
 	Kp = _kp;
 	Ki = _ki;
 	halfT = _halfT;
+
+	return 0;
 }
 
-uint8_t mod_imu_update(float gx, float gy, float gz, float ax, float ay, float az)
+/* @beief     imu计算核心代码
+ * @return    0 - 成功 <0 表示返回失败
+ * */
+int mod_imu_update(float gx, float gy, float gz, float ax, float ay, float az)
 {
 	float norm;
 	float vx, vy, vz;
@@ -91,7 +98,10 @@ uint8_t mod_imu_update(float gx, float gy, float gz, float ax, float ay, float a
 	return 0;
 }
 
-uint8_t mid_imu_get_state(imu_data_t* _imu_data)
+/* @beief     获取imu的计算数据
+ * @return    0 - 成功 <0 表示返回失败
+ * */
+int mid_imu_get_data(imu_data_t* _imu_data)
 {
 	memcpy(_imu_data, &imu_data, sizeof(imu_data_t));
 	return 0;

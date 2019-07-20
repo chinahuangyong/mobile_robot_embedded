@@ -25,8 +25,19 @@ typedef struct imu_data_struct
 	float q3;
 }imu_data_t;
 
-uint8_t mod_imu_init(float _kp, float _ki, float _halfT);
-uint8_t mod_imu_update(float gx, float gy, float gz, float ax, float ay, float az);
-uint8_t mid_imu_get_state(imu_data_t* _imu_data);
+/* @beief     imu计算函数初始化
+ * @return    0 - 成功 <0 表示返回失败
+ * */
+int mod_imu_init(float _kp, float _ki, float _halfT);
+
+/* @beief     imu计算核心代码
+ * @return    0 - 成功 <0 表示返回失败
+ * */
+int mod_imu_update(float gx, float gy, float gz, float ax, float ay, float az);
+
+/* @beief     获取imu的计算数据
+ * @return    0 - 成功 <0 表示返回失败
+ * */
+int mid_imu_get_data(imu_data_t* _imu_data);
 
 #endif /* SRC_TASK_IMU_H_ */
