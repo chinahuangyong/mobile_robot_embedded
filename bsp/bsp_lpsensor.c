@@ -24,8 +24,8 @@
 #include "bsp_uart0.h"
 
 uint8_t rx_buffer[MAX_PACKET_LENS] = {0};
-lpmsttl_packet_t lpms_packet;
-lpmsttl_data_ts_t lpms_data_ts;
+lpmsttl_packet_t lpmsttl_packet;
+lpmsttl_data_ts_t lpmsttl_data_ts;
 
 /* @beief     lpms将整数转化成浮点数，此处注意和类型强制转换的区别
  * @return    0 - 成功 <0 表示返回失败
@@ -152,36 +152,36 @@ int bsp_lpmsttl_get_packet(void)
     uint16_t check_sum = 0;
     uint16_t i = 0;
     /* 获取帧头*/
-    lpms_packet.start = rx_buffer[0];
+    lpmsttl_packet.start = rx_buffer[0];
     /* 获取传感器ID */
-    lpms_packet.sensor_id = rx_buffer[1] | ((uint16_t)(rx_buffer[2])<<8);
+    lpmsttl_packet.sensor_id = rx_buffer[1] | ((uint16_t)(rx_buffer[2])<<8);
     /* 获取命令 */
-    lpms_packet.cmd =  rx_buffer[3] | ((uint16_t)(rx_buffer[4])<<8);
+    lpmsttl_packet.cmd =  rx_buffer[3] | ((uint16_t)(rx_buffer[4])<<8);
     /* 获取数据段的数据长度 */
-    lpms_packet.len = rx_buffer[5] | ((uint16_t)(rx_buffer[6])<<8);
+    lpmsttl_packet.len = rx_buffer[5] | ((uint16_t)(rx_buffer[6])<<8);
     /* 将数据段的数据进行拷贝 */
-    for(i = 0; i < lpms_packet.len; i++)
+    for(i = 0; i < lpmsttl_packet.len; i++)
     {
-        lpms_packet.data[i] = rx_buffer[7 + i];
+    	lpmsttl_packet.data[i] = rx_buffer[7 + i];
     }
     /* 计算校验值 */
-    for(i = 1; i< 7+lpms_packet.len; i++)
+    for(i = 1; i< 7+lpmsttl_packet.len; i++)
     {
-        check_sum += lpms_packet.data[i];
+        check_sum += lpmsttl_packet.data[i];
     }
 
-    lpms_packet.sum_check = lpms_packet.data[lpms_packet.len+7] |
-                            ((uint16_t)(lpms_packet.data[lpms_packet.len+8])<<8);
+    lpmsttl_packet.sum_check = lpmsttl_packet.data[lpmsttl_packet.len+7] |
+                            ((uint16_t)(lpmsttl_packet.data[lpmsttl_packet.len+8])<<8);
     /* 校验校验值 */
-    if(check_sum != lpms_packet.sum_check)
+    if(check_sum != lpmsttl_packet.sum_check)
     {
         memset(rx_buffer, 0, sizeof(rx_buffer));
-        memset(&lpms_packet, 0, sizeof(lpms_packet_t));
+        memset(&lpmsttl_packet, 0, sizeof(lpmsttl_packet_t));
         return -1;
     }
     /* 获取帧尾 */
-    lpms_packet.end = (uint16_t)((lpms_packet.data[9 + lpms_packet.len] << 8) |
-                      lpms_packet.data[10 + lpms_packet.len]);
+    lpmsttl_packet.end = (uint16_t)((lpmsttl_packet.data[9 + lpmsttl_packet.len] << 8) |
+    		lpmsttl_packet.data[10 + lpmsttl_packet.len]);
 
     memset(rx_buffer, 0, sizeof(rx_buffer));
 
@@ -193,13 +193,13 @@ int bsp_lpmsttl_get_packet(void)
  * */
 int bsp_lpmsttl_parse_packet(void)
 {
-    if(!bsp_lpms_get_packet())
+    if(!bsp_lpmsttl_get_packet())
         return -1;
 
-    switch(lpms_packet.cmd)
+    switch(lpmsttl_packet.cmd)
     {
     case 0x0009:    //
-    	bsp_lpms_parse_data();
+    	bsp_lpmsttl_parse_data();
         break;
 //    case GET_CONFIG:
 ////        hme1.Config = *(uint32_t *)rxPacket.data;
@@ -221,32 +221,32 @@ int bsp_lpmsttl_parse_data(void)
 {
 	uint32_t data_u32;
 
-	lpms_data_ts.lpms_data.sensor_ts = (((uint32_t)lpms_packet.data[3])<<24 | ((uint32_t)lpms_packet.data[2])<<16 |
-			((uint32_t)lpms_packet.data[1])<<8 | ((uint32_t)lpms_packet.data[0]))*0.0025;
+	lpmsttl_data_ts.lpmsttl_data.sensor_ts = (((uint32_t)lpmsttl_packet.data[3])<<24 | ((uint32_t)lpmsttl_packet.data[2])<<16 |
+			((uint32_t)lpmsttl_packet.data[1])<<8 | ((uint32_t)lpmsttl_packet.data[0]))*0.0025;
 
-	data_u32 = (((uint32_t)lpms_packet.data[7])<<24 | ((uint32_t)lpms_packet.data[6])<<16 |
-			   ((uint32_t)lpms_packet.data[5])<<8 | ((uint32_t)lpms_packet.data[4]));
-	lpms_data_ts.lpms_data.gyro_x = uint2float(data_u32);
+	data_u32 = (((uint32_t)lpmsttl_packet.data[7])<<24 | ((uint32_t)lpmsttl_packet.data[6])<<16 |
+			   ((uint32_t)lpmsttl_packet.data[5])<<8 | ((uint32_t)lpmsttl_packet.data[4]));
+	lpmsttl_data_ts.lpmsttl_data.gyro_x = uint2float(data_u32);
 
-	data_u32 = (((uint32_t)lpms_packet.data[11])<<24 | ((uint32_t)lpms_packet.data[10])<<16 |
-			((uint32_t)lpms_packet.data[9])<<8 | ((uint32_t)lpms_packet.data[8]));
-	lpms_data_ts.lpms_data.gyro_y = uint2float(data_u32);
+	data_u32 = (((uint32_t)lpmsttl_packet.data[11])<<24 | ((uint32_t)lpmsttl_packet.data[10])<<16 |
+			((uint32_t)lpmsttl_packet.data[9])<<8 | ((uint32_t)lpmsttl_packet.data[8]));
+	lpmsttl_data_ts.lpmsttl_data.gyro_y = uint2float(data_u32);
 
-	data_u32 = (((uint32_t)lpms_packet.data[15])<<24 | ((uint32_t)lpms_packet.data[14])<<16 |
-			((uint32_t)lpms_packet.data[13])<<8 | ((uint32_t)lpms_packet.data[12]));
-	lpms_data_ts.lpms_data.gyro_z = uint2float(data_u32);
+	data_u32 = (((uint32_t)lpmsttl_packet.data[15])<<24 | ((uint32_t)lpmsttl_packet.data[14])<<16 |
+			((uint32_t)lpmsttl_packet.data[13])<<8 | ((uint32_t)lpmsttl_packet.data[12]));
+	lpmsttl_data_ts.lpmsttl_data.gyro_z = uint2float(data_u32);
 
-	data_u32 = (((uint32_t)lpms_packet.data[19])<<24 | ((uint32_t)lpms_packet.data[18])<<16 |
-			((uint32_t)lpms_packet.data[17])<<8 | ((uint32_t)lpms_packet.data[16]));
-	lpms_data_ts.lpms_data.acc_x = uint2float(data_u32);
+	data_u32 = (((uint32_t)lpmsttl_packet.data[19])<<24 | ((uint32_t)lpmsttl_packet.data[18])<<16 |
+			((uint32_t)lpmsttl_packet.data[17])<<8 | ((uint32_t)lpmsttl_packet.data[16]));
+	lpmsttl_data_ts.lpmsttl_data.acc_x = uint2float(data_u32);
 
-	data_u32 = (((uint32_t)lpms_packet.data[23])<<24 | ((uint32_t)lpms_packet.data[22])<<16 |
-			((uint32_t)lpms_packet.data[21])<<8 | ((uint32_t)lpms_packet.data[20]));
-	lpms_data_ts.lpms_data.acc_y = uint2float(data_u32);
+	data_u32 = (((uint32_t)lpmsttl_packet.data[23])<<24 | ((uint32_t)lpmsttl_packet.data[22])<<16 |
+			((uint32_t)lpmsttl_packet.data[21])<<8 | ((uint32_t)lpmsttl_packet.data[20]));
+	lpmsttl_data_ts.lpmsttl_data.acc_y = uint2float(data_u32);
 
-	data_u32 = (((uint32_t)lpms_packet.data[27])<<24 | ((uint32_t)lpms_packet.data[26])<<16 |
-			((uint32_t)lpms_packet.data[25])<<8 | ((uint32_t)lpms_packet.data[24]));
-	lpms_data_ts.lpms_data.acc_z = uint2float(data_u32);
+	data_u32 = (((uint32_t)lpmsttl_packet.data[27])<<24 | ((uint32_t)lpmsttl_packet.data[26])<<16 |
+			((uint32_t)lpmsttl_packet.data[25])<<8 | ((uint32_t)lpmsttl_packet.data[24]));
+	lpmsttl_data_ts.lpmsttl_data.acc_z = uint2float(data_u32);
 
 	return 0;
 }
