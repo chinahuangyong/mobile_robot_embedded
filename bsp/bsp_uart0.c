@@ -50,14 +50,14 @@ int bsp_uart0_init(void)
 	}
 	
 	//查找UART0的配置信息
-	Config = XUartPs_LookupConfig(UART_DEVICE_ID);
-	if (NULL == Config)
+	config = XUartPs_LookupConfig(UART_DEVICE_ID);
+	if (NULL == config)
 	{
 		return -1;
 	}
 
 	//初始化UART0的相关寄存器
-	status = XUartPs_CfgInitialize(pxUart0InstPtr, Config, Config->BaseAddress);
+	status = XUartPs_CfgInitialize(pxUart0InstPtr, config, config->BaseAddress);
 	if (status != XST_SUCCESS)
 	{
 		return -1;
