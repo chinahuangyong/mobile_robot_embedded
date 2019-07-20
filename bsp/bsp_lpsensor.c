@@ -22,6 +22,7 @@
 
 #include "bsp_lpsensor.h"
 #include "bsp_uart0.h"
+#include "bsp_timer_axi0.h"
 
 uint8_t rx_buffer[MAX_PACKET_LENS] = {0};
 lpmsttl_packet_t lpmsttl_packet;
@@ -121,6 +122,8 @@ int bsp_lpmsttl_get_frame(void)
 					{
 						rx_buffer_cnt = 0;
 						rx_data_lens = 0;
+						//接收数据成功，获取本地的时间戳
+						lpmsttl_data_ts.local_ts = bsp_axi0timer_get();
 						return 0;
 					}
 					else
