@@ -29,7 +29,7 @@ XUartPs Uart0InstPtr;
 XUartPs *pxUart0InstPtr = &Uart0InstPtr;
 
 //串口接收队列句柄
-static QueueHandle_t uart_rec_queue = NULL;
+QueueHandle_t uart_rec_queue = NULL;
 
 //中断处理函数
 void uart0_isr_handle(void);

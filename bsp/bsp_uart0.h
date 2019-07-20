@@ -28,7 +28,7 @@
 extern "C"{
 #endif
 
-extern QueueHandle_t uartRecQueue;
+extern QueueHandle_t uart_rec_queue;
 
 /* @beief     UART0初始化函数
  * @return    0-成功 <0-失败
