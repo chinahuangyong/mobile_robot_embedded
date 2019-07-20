@@ -81,7 +81,8 @@ uint8_t mod_imu_update(float gx, float gy, float gz, float ax, float ay, float a
 	imu_data.q2 = q2;
 	imu_data.q3 = q3;
 
-//	imu_data.yaw = atan2(2 * q1 * q2 + 2 * q0 * q3, -2 * q2*q2 - 2 * q3* q3 + 1)* 57.3; // yaw
+	//yaw获取，单位为°
+	imu_data.yaw = atan2(2 * q1 * q2 + 2 * q0 * q3, -2 * q2*q2 - 2 * q3* q3 + 1)* 57.3; // yaw
 	// pitch获取，单位为°
 	imu_data.pitch  = asin(-2 * q1 * q3 + 2 * q0* q2)* 57.32484; 
 	// roll获取，单位为°
