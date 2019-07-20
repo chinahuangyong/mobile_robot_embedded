@@ -5,7 +5,7 @@
   * @version V0.0.1
   * @Company CVTE
   * @date    2019-7-10
-  * @brief
+  * @brief   IMU状态解算相关操作文件
   *
   * @history
   *          2019-7-12 HuangYong 创建文件

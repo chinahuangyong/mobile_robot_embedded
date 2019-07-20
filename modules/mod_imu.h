@@ -1,12 +1,18 @@
-/*
- * imu.h
- *
- *  Created on: 2019��7��6��
- *      Author: HuangYong
- */
+/*******************************************************************************
+    All Copyright(c) 2018-2019 Receive By Guangzhou Shiyuan Electronics CO.Ltd.
+  * @file    bsp_motor.c
+  * @author  HuangYong(huangyong6295@cvte.com)
+  * @version V0.0.1
+  * @Company CVTE
+  * @date    2019-7-10
+  * @brief   IMU状态解算相关操作文件
+  *
+  * @history
+  *          2019-7-12 HuangYong 创建文件
+*********************************************************************************/
 
-#ifndef SRC_MOD_IMU_H_
-#define SRC_MOD_IMU_H_
+#ifndef __MOD_IMU_H_
+#define __MOD_IMU_H_
 
 #include <stdint.h>
 #include <stdio.h>
