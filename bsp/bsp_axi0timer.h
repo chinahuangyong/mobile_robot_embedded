@@ -26,12 +26,12 @@ extern "C"{
 /* @beief     axi 定时器初始化
  * @return    0 - 成功 <0 表示返回失败
  * */
-void bsp_axi0timer_init(void);
+int bsp_axi0timer_init(void);
 
 /* @beief     axi 定时器启动
  * @return    0 - 成功 <0 表示返回失败
  * */
-void bsp_axi0timer_start(void);
+int bsp_axi0timer_start(void);
 
 /* @beief     axi 定时器计数值获取函数
  * */
