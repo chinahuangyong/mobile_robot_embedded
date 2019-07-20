@@ -4,13 +4,13 @@
   * @author  HuangYong
   * @version V0.0.1
   * @Company CVTE
-  * @date    2017-05-06
-  * @brief   ������������
+  * @date    2017-07-06
+  * @brief   系统任务启动函数
   * @history
-       2019.06.20  ��������
-       2019.06.27
+       2019.07.06  创建文件，创建start任务
+       2019.06.27  将task_start文件移植转Linux的编程环境下，并优化文件代码
 ********************************************************************************/
-#include <bsp_can0.h>
+
 #include <stdint.h>
 
 #include "FreeRTOS.h"
@@ -19,12 +19,9 @@
 
 #include "xil_printf.h"
 
-#include "bsp_timer.h"
 #include "bsp_stmotor.h"
 
 #include "task_start.h"
-#include "task_camera_sync.h"
-#include "task_net.h"
 
 #define TASK_START_PRIO 2
 #define TASK_START_STK_SIZE 1024
@@ -49,30 +46,13 @@ void task_start(void *argument)
 
 	taskENTER_CRITICAL();
 
-//	bsp_timer_init();
-//	bsp_timer_start();
-
 	bsp_can0_init();
 	bsp_stmotor_init();
-//	task_lpsensor_init();
-
-
-//	task_net_init();
-//	task_camera_sync_init();
 
 	taskEXIT_CRITICAL();
 
 	for(;;)
 	{
-//		if(xQueueReceive(xTimeStamp, &time_u, portMAX_DELAY))
-//		{
-//			xil_printf("%u,%u,%u\r\n", time_u.time_h,time_u.time_l,time_u.len);
-//		}
-//		else
-//		{
-//		}
-//		bsp_can0_send(can_msg);
-//		vTaskDelay(100);
 
 	}
 }
