@@ -22,7 +22,7 @@
 
 #include "bsp_lpsensor.h"
 #include "bsp_uart0.h"
-#include "bsp_timer_axi0.h"
+#include "bsp_axi0timer.h"
 
 uint8_t rx_buffer[MAX_PACKET_LENS] = {0};
 lpmsttl_packet_t lpmsttl_packet;
