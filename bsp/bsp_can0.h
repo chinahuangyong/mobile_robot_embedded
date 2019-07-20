@@ -14,10 +14,10 @@
 #ifndef __BSP_CAN0_H
 #define __BSP_CAN0_H
 
-#include "xparameters.h"	/* SDK generated parameters */
+#include "xparameters.h"	
 #include "xplatform_info.h"
 #include "xcanps.h"
-#include "xscugic.h"		/* Interrupt controller device driver */
+#include "xscugic.h"		
 #include "xil_exception.h"
 
 #include "FreeRTOS.h"
@@ -31,23 +31,12 @@ extern "C" {
 //
 typedef struct
 {
-  uint32_t std_id;       /*!< Specifies the standard identifier.
-                             This parameter must be a number between Min_Data = 0 and Max_Data = 0x7FF */
-
-  uint32_t ext_id;       /*!< Specifies the extended identifier.
-                             This parameter must be a number between Min_Data = 0 and Max_Data = 0x1FFFFFFF */
-
-  uint32_t ide;          /*!< Specifies the type of identifier for the message that will be received.
-                             This parameter can be a value of @ref CAN_Identifier_Type */
-
-  uint32_t rtr;          /*!< Specifies the type of frame for the received message.
-                             This parameter can be a value of @ref CAN_remote_transmission_request */
-
-  uint32_t dlc;          /*!< Specifies the length of the frame that will be received.
-                             This parameter must be a number between Min_Data = 0 and Max_Data = 8 */
-
-  uint8_t data[8];       /*!< Contains the data to be received.
-                             This parameter must be a number between Min_Data = 0 and Max_Data = 0xFF */
+  uint32_t std_id;       /*!< 标准帧ID Min_Data = 0 and Max_Data = 0x7FF */
+  uint32_t ext_id;       /*!< 拓展帧ID Min_Data = 0 and Max_Data = 0x1FFFFFFF */
+  uint32_t ide;          /*!< 拓展帧标志 @ref CAN_Identifier_Type */
+  uint32_t rtr;          /*!< 远程帧标志 @ref CAN_remote_transmission_request */
+  uint32_t dlc;          /*!< 数据段长度标志 between Min_Data = 0 and Max_Data = 8 */
+  uint8_t data[8];       /*!< 数据段数据 between Min_Data = 0 and Max_Data = 0xFF */
 
 }can_msg_t;
 
