@@ -27,20 +27,19 @@ typedef struct bsp_motor_struct
 	int16_t left_motor_rpm;	//左轮的转速	r/min
 	int16_t right_motor_rpm;//右轮的转速	r/min
 
-	float left_motor_mmps;	//左轮的转速 mm/s
-	float right_motor_mmps;	//右轮的转速 mm/s
+	float left_motor_mps;	//左轮的转速 m/s
+	float right_motor_mps;	//右轮的转速 m/s
 
 	uint32_t pluse_pre_round;	//编码器线数，即旋转一圈的脉冲个数
-	float mm_pre_round;			//轮子的周长
+	float m_pre_round;			//轮子的周长
 
-	int (*init)(void);
+    int (*init)(void);
 	int (*enable)(void);
 	int (*disable)(void);
 	int (*set_rpm_speed)(int16_t left_rpm, int16_t right_rpm);
 	int (*get_rpm_speed)(int16_t* left_rpm, int16_t right_rpm);
-	int (*set_mmps_speed)(float left_mmps, float right_mmps);
-	int (*get_mmps_speed)(float* left_mmps, float* right_mmps);
-	void (*data_receive_isr_callback)(void);
+	int (*set_mps_speed)(float left_mps, float right_mps);
+	int (*get_mps_speed)(float* left_mps, float* right_mps);
 }bsp_motor_t;
 
 #ifdef __cplusplus
