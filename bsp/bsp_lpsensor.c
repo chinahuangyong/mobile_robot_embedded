@@ -37,15 +37,15 @@ static float uint2float(uint32_t data_u32)
     memcpy(&data_f32, &data_u32, 4);
 }
 
-/* @beief     lpms数据发送函数
- * @return    0 - 成功 <0 表示返回失败
- * */
-static int bsp_lpmsttl_send(uint8_t* p_data, uint16_t size)
-{
-	bsp_uart0_send(p_data, size);
-
-	return 1;
-}
+///* @beief     lpms数据发送函数
+// * @return    0 - 成功 <0 表示返回失败
+// * */
+//static int bsp_lpmsttl_send(uint8_t* p_data, uint16_t size)
+//{
+//	bsp_uart0_send(p_data, size);
+//
+//	return 1;
+//}
 
 /* @beief     lpms数据接收函数
  * @param[out]p_data - 接收数据变量指针
@@ -251,5 +251,14 @@ int bsp_lpmsttl_parse_data(void)
 			((uint32_t)lpmsttl_packet.data[25])<<8 | ((uint32_t)lpmsttl_packet.data[24]));
 	lpmsttl_data_ts.lpmsttl_data.acc_z = uint2float(data_u32);
 
+	return 0;
+}
+
+/* @beief     lpms解析数据，获取对应的IMU的数据值
+ * @return    0 - 成功 <0 表示失败
+ * */
+int bsp_lpmsttl_get_data(lpmsttl_data_ts_t* lpmsttl_data_ts)
+{
+	memcpy(lpmsttl_data_ts, &lpmsttl_data_ts, sizeof(lpmsttl_data_ts_t));
 	return 0;
 }

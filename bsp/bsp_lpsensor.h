@@ -21,8 +21,7 @@ extern "C" {
 #include "stdint.h"
 #include "stdlib.h"
 #include "string.h"
-
-#define MAX_PACKET_LENS                                
+                              
 #define MAX_PACKET_DATA_LENS       100
 
 //LPMS Modbus数据包结构体
@@ -73,11 +72,31 @@ typedef struct lpmsttl_data_ts_struct
  * @return    0 - 成功 <0 表示返回失败
  * */
 int bsp_lpmsttl_init(void);
+
+/* @beief     lpms获取完整一帧数据，该协议解析主要帧对lpms-ttlal2
+ * @return    0 - 成功 <0 表示失败
+ * */
 int bsp_lpmsttl_get_frame(void);
+
+/* @beief     lpms获取完整一帧数据
+ * @return    0 - 成功 <0 表示失败
+ * */
 int bsp_lpmsttl_get_packet(void);
+
+/* @beief     lpms解析数据包
+ * @return    0 - 成功 <0 表示失败
+ * */
 int bsp_lpmsttl_parse_packet(void);
+
+/* @beief     lpms解析数据，获取对应的IMU的数据值
+ * @return    0 - 成功 <0 表示失败
+ * */
 int bsp_lpmsttl_parse_data(void);
-float int2float(float * _f,uint8_t * _u8);
+
+/* @beief     lpms解析数据，获取对应的IMU的数据值
+ * @return    0 - 成功 <0 表示失败
+ * */
+int bsp_lpmsttl_get_data(lpmsttl_data_ts_t* lpmsttl_data_ts);
 
 #ifdef __cplusplus
 }
