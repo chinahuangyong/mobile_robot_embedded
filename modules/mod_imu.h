@@ -17,9 +17,6 @@
 #include <stdint.h>
 #include <stdio.h>
 
-extern float roll;
-extern float pitch;
-
 typedef struct imu_data_struct
 {
 	float roll;
