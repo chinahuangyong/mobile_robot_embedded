@@ -50,7 +50,7 @@ int bsp_can0_init(void)
 	ConfigPtr = XCanPs_LookupConfig(CAN0_DEVICE_ID);
 	if (ConfigPtr == NULL)
 	{
-
+		return -1;
 	}
 	XCanPs_CfgInitialize(&Can0InstPtr, ConfigPtr, ConfigPtr->BaseAddr);
 
@@ -58,6 +58,7 @@ int bsp_can0_init(void)
 	Status = XCanPs_SelfTest(&Can0InstPtr);
 	if (Status != XST_SUCCESS)
 	{
+		return -1;
 	}
 
 	//进入配置模式，并等待配置模式进入完成
@@ -81,6 +82,7 @@ int bsp_can0_init(void)
 					  (void *)&Can0InstPtr);
 	if (Status != XST_SUCCESS)
 	{
+		return -1;
 	}
 	//使用CAN中断源-使能接收FIFO非空中断
 	XCanPs_IntrEnable(&Can0InstPtr, XCANPS_IXR_RXNEMP_MASK);
