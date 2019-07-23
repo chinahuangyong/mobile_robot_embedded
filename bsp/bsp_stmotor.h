@@ -55,18 +55,18 @@ int bsp_stmotor_set_rpm_speed(int16_t left_rpm, int16_t right_rpm);
 int bsp_stmotor_get_rpm_speed(int16_t* left_motor_rpm, int16_t* right_motor_rpm);
 
 /* @beief     电机转速设置函数
- * @param[in] left_motor_mmps - 电机左轮转速mmps(mm/s)
- * @param[in] right_motor_mmps - 电机右轮转速mmps(mm/s)
+ * @param[in] left_motor_mps - 电机左轮转速mmps(m/s)
+ * @param[in] right_motor_mps - 电机右轮转速mmps(mm/s)
  * @return    0 - 成功 <0 表示返回失败
  * */
-int bsp_stmotor_set_mmps_speed(float left_motor_mmps, float right_motor_mmps);
+int bsp_stmotor_set_mps_speed(float left_motor_mps, float right_motor_mps);
 
 /* @beief     电机转速获取函数
- * @param[out] left_motor_mmps - 电机左轮转速mmps(mm/s)
- * @param[out] right_motor_mmps - 电机右轮转速mmps(mm/s)
+ * @param[out] left_motor_mps - 电机左轮转速mmps(m/s)
+ * @param[out] right_motor_mps - 电机右轮转速mmps(m/s)
  * @return    0 - 成功 <0 表示返回失败
  * */
-int bsp_stmotor_get_mmps_speed(float* left_motor_mmps, float* right_motor_mmps);
+int bsp_stmotor_get_mps_speed(float* left_motor_mps, float* right_motor_mps);
 
 /* @beief     电机编码器脉冲个数获取
  * @param[in] left_motor_position - 电机左轮脉冲个数
@@ -76,11 +76,11 @@ int bsp_stmotor_get_mmps_speed(float* left_motor_mmps, float* right_motor_mmps);
 int bsp_stmotor_get_pluse_position(int32_t* left_motor_position, int32_t* right_motor_position);
 
 /* @beief     电机编码器毫米数获取
- * @param[in] left_motor_position - 电机左轮脉冲毫米数
- * @param[in] right_motor_position - 电机右轮脉冲毫米数
+ * @param[in] left_motor_position - 电机左轮脉冲米数
+ * @param[in] right_motor_position - 电机右轮脉冲米数
  * @return    0 - 成功 <0 表示返回失败
  * */
-int bsp_stmotor_get_mm_position(float* left_motor_position, float* right_motor_position);
+int bsp_stmotor_get_m_position(float* left_motor_position, float* right_motor_position);
 
 /* @beief     中断回调函数
  * @return    无

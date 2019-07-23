@@ -46,9 +46,9 @@ const uint8_t right_motor_id = 2;
 const uint8_t master_id = 0;
 
 //轮子的周长
-const float radius = 5600;	//车辆的半径(mm)
+const float radius = 0.13;	//车辆的半径(m)
 const float timeout = 10;	//通信超时时间设置(ms)
-const float PULSE_NUM_PRE_ROUND = 10000;
+const float PULSE_NUM_PRE_ROUND = 5600;
 
 //电机运动的方向
 uint8_t run_direction = 0;	//车体运行的方向
@@ -73,6 +73,8 @@ int bsp_stmotor_init(void)
 
 	left_motor_pulse_position = 0;
 	right_motor_pulse_position = 0;
+
+	bsp_can0_init();
 
 	stmotor_recv_ev =  xEventGroupCreate();
 	if(stmotor_recv_ev == NULL)
@@ -257,16 +259,16 @@ int bsp_stmotor_get_rpm_speed(int16_t* left_motor_rpm, int16_t* right_motor_rpm)
 }
 
 /* @beief     电机转速设置函数
- * @param[in] left_motor_mmps - 电机左轮转速mmps(mm/s)
- * @param[in] right_motor_mmps - 电机右轮转速mmps(mm/s)
+ * @param[in] left_motor_mps - 电机左轮转速mps(m/s)
+ * @param[in] right_motor_mps - 电机右轮转速mps(m/s)
  * @return    0 - 成功 <0 表示返回失败
  * */
-int bsp_stmotor_set_mmps_speed(float left_motor_mmps, float right_motor_mmps)
+int bsp_stmotor_set_mps_speed(float left_motor_mps, float right_motor_mps)
 {
 	int ret;
-	//将mm/s的转速转换成r/min
-	int16_t left_motor_rpm = (int16_t)(lround(left_motor_mmps*60.0/(2.0*M_PI*radius)));
-	int16_t right_motor_rpm = (int16_t)(lround(right_motor_mmps*60.0/(2.0*M_PI*radius)));
+	//将m/s的转速转换成r/min
+	int16_t left_motor_rpm = (int16_t)(lround(left_motor_mps*60.0/(2.0*M_PI*radius)));
+	int16_t right_motor_rpm = (int16_t)(lround(right_motor_mps*60.0/(2.0*M_PI*radius)));
 
 	ret = bsp_stmotor_set_rpm_speed(left_motor_rpm, right_motor_rpm);
 	if(ret == 0)
@@ -280,11 +282,11 @@ int bsp_stmotor_set_mmps_speed(float left_motor_mmps, float right_motor_mmps)
 }
 
 /* @beief     电机转速获取函数
- * @param[out] left_motor_mmps - 电机左轮转速mmps(mm/s)
- * @param[out] right_motor_mmps - 电机右轮转速mmps(mm/s)
+ * @param[out] left_motor_mps - 电机左轮转速mmps(m/s)
+ * @param[out] right_motor_mps - 电机右轮转速mmps(m/s)
  * @return    0 - 成功 <0 表示返回失败
  * */
-int bsp_stmotor_get_mmps_speed(float* left_motor_mmps, float* right_motor_mmps)
+int bsp_stmotor_get_mps_speed(float* left_motor_mps, float* right_motor_mps)
 {
 	int ret;
 	int16_t left_motor_rpm, right_motor_rpm;
@@ -292,8 +294,8 @@ int bsp_stmotor_get_mmps_speed(float* left_motor_mmps, float* right_motor_mmps)
 
 	if(ret == 0)
 	{
-		*left_motor_mmps = (float)left_motor_rpm*2.0*M_PI*radius/60.0;
-		*right_motor_mmps = (float)right_motor_rpm*2.0*M_PI*radius/60.0;
+		*left_motor_mps = (float)left_motor_rpm*2.0*M_PI*radius/60.0;
+		*right_motor_mps = (float)right_motor_rpm*2.0*M_PI*radius/60.0;
 
 		return 0;
 	}
@@ -348,11 +350,11 @@ int bsp_stmotor_get_pluse_position(int32_t* left_motor_position, int32_t* right_
 }
 
 /* @beief     电机编码器毫米数获取
- * @param[in] left_motor_position - 电机左轮脉冲毫米数
- * @param[in] right_motor_position - 电机右轮脉冲毫米数
+ * @param[in] left_motor_position - 电机左轮脉冲米数
+ * @param[in] right_motor_position - 电机右轮脉冲米数
  * @return    0 - 成功 <0 表示返回失败
  * */
-int bsp_stmotor_get_mm_position(float* left_motor_position, float* right_motor_position)
+int bsp_stmotor_get_m_position(float* left_motor_position, float* right_motor_position)
 {
 	int ret;
 	int32_t left_position, right_position;
@@ -421,11 +423,11 @@ void can0_isr_callback(can_msg_t* data)
 			}
 			else if(can_msg.data[1] == 0xE)	//读编码值返回的应答码
 			{
-				if(can_msg.data[2] == 0x00 && can_msg.data[3] == 0x1C)	//Dn1D Dn1E
+				if(can_msg.data[2] == 0x00 && can_msg.data[3] == 0x1D)	//Dn1D Dn1E
 				{
 					left_motor_pulse_position =
-							((uint32_t)can_msg.data[4]) << 24 |((uint32_t)(can_msg.data[5]))<<16 |
-							((uint32_t)can_msg.data[6]) << 8 | ((uint32_t)can_msg.data[7]);
+							((uint32_t)can_msg.data[6]) << 24 |((uint32_t)(can_msg.data[7]))<<16 |
+							((uint32_t)can_msg.data[4]) << 8 | ((uint32_t)can_msg.data[5]);
 					xEventGroupSetBitsFromISR(stmotor_recv_ev, BSP_STMOTOR_EV_LF_GETPOSITION,
 								&xHigherPriorityTaskWoken);
 				}
@@ -472,11 +474,11 @@ void can0_isr_callback(can_msg_t* data)
 			}
 			else if(can_msg.data[1] == 0xE)	//读编码值返回的应答码
 			{
-				if(can_msg.data[2] == 0x00 && can_msg.data[3] == 0x1C)	//Dn1D Dn1E
+				if(can_msg.data[2] == 0x00 && can_msg.data[3] == 0x1D)	//Dn1D Dn1E
 				{
 					right_motor_pulse_position =
-							((uint32_t)can_msg.data[4]) << 24 |((uint32_t)(can_msg.data[5]))<<16 |
-							((uint32_t)can_msg.data[6]) << 8 | ((uint32_t)can_msg.data[7]);
+							((uint32_t)can_msg.data[6]) << 24 |((uint32_t)(can_msg.data[7]))<<16 |
+							((uint32_t)can_msg.data[4]) << 8 | ((uint32_t)can_msg.data[5]);
 					xEventGroupSetBitsFromISR(stmotor_recv_ev, BSP_STMOTOR_EV_RT_GETPOSITION,
 								&xHigherPriorityTaskWoken);
 				}
