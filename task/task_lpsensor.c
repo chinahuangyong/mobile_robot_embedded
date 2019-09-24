@@ -27,10 +27,12 @@
 TaskHandle_t handle_lpsensor;
 void task_lpsensor(void *argument);
 
+lpmsttl_data_ts_t lpmsttl_data_ts;
 
 void task_lpsensor_init(void)
 {
 	bsp_lpms_init();
+	bsp_imu_init();
 
 	xTaskCreate((TaskFunction_t)task_lpsensor,
 		              (const char *)"task_lpsensor",
@@ -44,31 +46,25 @@ uint64_t time_now;
 void task_lpsensor(void* argument)
 {
 	uint8_t data = 0;
-//	uint8_t length = 0;
 
 	for(;;)
 	{
-//		if (xQueueReceive(uartRecQueue, &data, portMAX_DELAY) == pdTRUE)
-//		{
-//			bsp_lpms_getFrame(data);
-//			if(bsp_lpms_isGetFrame())
-//			{
-//				if(bsp_lpms_parsePacket())
-//				{
-//					mod_imu_update(lpmsRawData.gyroX, lpmsRawData.gyroY, lpmsRawData.gyroZ,
-//							lpmsRawData.accX*-9.8, lpmsRawData.accY*-9.8, lpmsRawData.accZ*-9.8);
-//
-//					static float data1 = 0;
-//					static float data2 = 0;
-//				//
-//					data1 += lpmsRawData.gyroX*0.01*57.3;
-//					data2 += lpmsRawData.gyroY*0.01*57.3;
-//
-////					#include "utils_osc.h"
-////					utils_osc_send(pitch, roll, data1, data2);
-//				}
-//			}
-//		}
+		if(bsp_lpmsttl_get_frame() == 0)
+		{
+			if(bsp_lpmsttl_get_packet() == 0)
+			{
+				if(bsp_lpmsttl_parse_packet() == 0)
+				{
+					bsp_lpmsttl_get_data(&lpmsttl_data_ts);
+					mod_imu_update(lpmsttl_data_ts.lpmsttl_data.gyro_x,
+							       lpmsttl_data_ts.lpmsttl_data.gyro_y,
+								   lpmsttl_data_ts.lpmsttl_data.gyro_z,
+								   lpmsttl_data_ts.lpmsttl_data.acc_x,
+								   lpmsttl_data_ts.lpmsttl_data.acc_y,
+								   lpmsttl_data_ts.lpmsttl_data.acc_z);
+				}
+			}
+		}
 	}
 }
 
